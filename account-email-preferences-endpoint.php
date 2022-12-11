@@ -1,5 +1,4 @@
 <?php
-
 /*
 Plugin Name: Newsletter - Woocommerce Account Preferences
 Author: Anton Roug

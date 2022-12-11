@@ -23,9 +23,9 @@ $local_options = NewsletterProfile::instance()->get_options('', $language);
 		<div id="content" class="site-content" role="main">
 			<div class="entry-content">
       	<div>
-				<h2>Notice</h2>
 				<?php
 				if ($user != $user_logged_in) { ?>
+				<h2>Notice</h2>
 				<p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
 					You reached email subscriptions through a newsletter.  The newsletter was sent to email address: <?php echo esc_attr($user->email);?>
 				</p>
