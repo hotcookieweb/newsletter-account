@@ -43,7 +43,7 @@ class Newsletter_Account_Endpoint {
 		// add processing from this class
 		add_action( 'woocommerce_account_' . self::$endpoint .  '_endpoint', array( $this, 'endpoint_content' ));
 		add_action( 'woocommerce_account_dashboard', array($this, 'hook_woocommerce_account_dashboard'));
-		add_action( 'woocommerce_after_customer_login_form', array($this, 'hook_woocommerce_account_login'));
+		add_action( 'woocommerce_before_customer_login_form', array($this, 'hook_woocommerce_account_login'));
 	}
 
 	/**
@@ -116,18 +116,33 @@ class Newsletter_Account_Endpoint {
 		// example TNP profile url:account/?nm=profile&nk=1-fa4290063e&nek=1-36064d5113
 		if (!isset($_GET['nm'])) return;
 
-		$newsletter = NewsletterSubscription::instance();
-		$user = $newsletter->get_user_from_request(false);
-		$user_logged_in = $newsletter->get_user_by_wp_user_id(get_current_user_id());
-		if ($user != $user_logged_in) {
-			wp_logout(); // something wrong, log current user out
+		if (isset($_GET['nek'])) {
+		 	$nek = '&nek=' . $_GET['nek'];
+	 	}
+		else {
+		 	$nek = '';
 		}
-		wp_redirect(site_url('/account/' . self::$endpoint .'?nm='. $_GET['nm'] .'&nk='. $_GET['nk']));
+		wp_redirect(site_url('/account/' . self::$endpoint .'?nm='. $_GET['nm'] .'&nk='. $_GET['nk'] . $nek));
 		exit();
 	}
 
 	public function hook_woocommerce_account_login() {
-		include_once( 'account-newsletter-logged-out.php' );
+		if (!isset($_GET['nm'])) return;
+		switch ($_GET['nm']) {
+			case 'unsubscription':
+			case 'unsubscribed':
+			case 'unsubscribe':
+				include_once( 'account-newsletter-logged-out-cancel.php' );
+				break;
+			case 'reactivated':
+			case 'confirmed':
+			case 'confirmation':
+			case 'profile':
+				include_once( 'account-newsletter-logged-out-profile.php' );
+				break;
+			default:
+				printf(__FILE__,__LINE__," Unrecognized nm %s\n", $_GET['nm']);
+		}
 	}
 
 	/**
